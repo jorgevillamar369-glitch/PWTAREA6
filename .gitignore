@@ -1,0 +1,6 @@
+# Credenciales locales y archivos del sistema
+includes/config.local.php
+includes/config.local.php.ejemplo
+*.log
+.DS_Store
+Thumbs.db
