@@ -1,138 +1,87 @@
 # A la Carta
 
-Sistema de gestión de restaurante con roles y permisos, hecho con HTML, CSS, JavaScript, Bootstrap 5, PHP 8 y MySQL/MariaDB. Corresponde a la Tarea 6 de Programación Web Avanzada (UBE).
+Sistema de gestión de restaurante con cuatro roles y permisos, hecho con PHP 8, MySQL/MariaDB, Bootstrap 5, CSS y JavaScript. Tarea 6 de Programación Web Avanzada (UBE).
 
 **Grupo 04:** Bruce Balarezo, Norka Mideros, Mauro Chinlle, Jorge Villamar y Liseth Criollo.
 
-El proyecto incluye la parte pública (portada, carta, registro y acceso) y la parte interna (panel, pedidos, carta administrativa y cuentas), con cuatro roles que solo ven lo que les corresponde.
+## Ejecutar en local
 
-## Requisitos
+Necesitas PHP 8.1 con `pdo_mysql` y MySQL 8 o MariaDB 10.4.
 
-- PHP 8.1 o superior con PDO MySQL.
-- MySQL 8 o MariaDB 10.4 o superior.
-- phpMyAdmin (opcional, para revisar la base).
-- Apache, Laragon o el servidor interno de PHP.
-
-## Instalación en local
-
-1. Importa la base desde la terminal:
+1. Importa la base:
 
    ```bash
    mysql -u root -p --default-character-set=utf8mb4 < sql/pwatarea6.sql
    ```
 
-   O abre `sql/pwatarea6.sql` en phpMyAdmin y ejecútalo. El archivo crea la base `pwatarea6`, las tablas y los datos de prueba.
-
-2. Revisa `includes/config.php`. Por defecto apunta a `127.0.0.1:3307`, base `pwatarea6`, usuario `root` sin contraseña.
-
-   Si tu servidor usa otros datos, crea `includes/config.local.php` (está excluido de Git):
+2. Revisa `includes/config.php`. Por defecto usa `127.0.0.1:3307`, base `pwatarea6`, usuario `root` sin contraseña. Si tu servidor usa otros datos, crea `includes/config.local.php` (está fuera de Git):
 
    ```php
    <?php
    return [
-       'host'    => '127.0.0.1',
-       'puerto'  => '3306',
-       'base'    => 'pwatarea6',
-       'usuario' => 'root',
-       'clave'   => '',
+       'host' => '127.0.0.1', 'puerto' => '3306',
+       'base' => 'pwatarea6', 'usuario' => 'root', 'clave' => '',
    ];
    ```
 
-3. Levanta el sitio:
+3. Levanta el sitio con `iniciar-local.bat` o con:
 
    ```bash
    php -S localhost:8080 -t .
    ```
 
-   Abre <http://localhost:8080>. También funciona dentro de Laragon o XAMPP copiando la carpeta a `www` o `htdocs`.
-
-   En Windows, el archivo `iniciar-local.bat` hace los dos pasos (MariaDB en el 3307 y PHP en el 8080) y abre el navegador.
+   Abre <http://localhost:8080>.
 
 ## Cuentas de prueba
 
-Todas usan la contraseña `ALaCarta2026`.
+Contraseña para todas: `ALaCarta2026`.
 
-| Rol | Correo | Usuario |
-| --- | --- | --- |
-| Administrador | admin@alacarta.ec | admin |
-| Chef | cocina@alacarta.ec | cocina |
-| Camarero | mesero@alacarta.ec | mesero |
-| Cliente | andres@correo.ec | andres |
-| Cliente | diana@correo.ec | diana |
+| Rol | Correo |
+| --- | --- |
+| Administrador | admin@alacarta.ec |
+| Chef | cocina@alacarta.ec |
+| Camarero | mesero@alacarta.ec |
+| Cliente | andres@correo.ec |
 
-## Roles y permisos
+`diana@correo.ec` también es una cuenta de cliente. El usuario de cada cuenta es la parte del correo antes de la arroba.
 
-| Acción | Administrador | Chef | Camarero | Cliente |
-| --- | :-: | :-: | :-: | :-: |
-| Ver la carta pública | sí | sí | sí | sí |
-| Ver todos los pedidos | sí | sí | sí | solo los propios |
-| Registrar un pedido | sí | no | sí | sí |
-| Pasar de pendiente a en preparación | sí | sí | no | no |
-| Pasar de en preparación a listo | sí | sí | no | no |
-| Pasar de listo a servido | sí | no | sí | no |
-| Crear, editar y eliminar platos | sí | no | no | no |
-| Crear cuentas y cambiar roles | sí | no | no | no |
-| Eliminar un pedido pendiente | sí | no | no | no |
+## Roles
 
-Los permisos se comprueban en el servidor en cada página (`includes/auth.php`), no solo al iniciar sesión. El cambio de estado solo acepta las transiciones permitidas (`siguiente_estado()` en `includes/funciones.php`).
+| Puede | Quién |
+| --- | --- |
+| Ver y gestionar la carta, y administrar cuentas | Administrador |
+| Ver todos los pedidos | Administrador, chef y camarero |
+| Registrar pedidos | Administrador, camarero y cliente |
+| Pasar pendiente → preparación → listo | Chef (el administrador también) |
+| Pasar listo → servido | Camarero (el administrador también) |
+| Ver solo sus propios pedidos | Cliente |
+
+Los permisos se comprueban en el servidor en cada página, y cada cambio de estado solo acepta las transiciones permitidas.
 
 ## Estructura
 
 ```
-├── index.php              Portada pública
-├── carta.php              Carta del restaurante
-├── login.php              Acceso
-├── registro.php           Registro de clientes
-├── logout.php
-├── panel.php              Panel según el rol
-├── pedidos.php            Lista con filtros y búsqueda
-├── pedido_nuevo.php       Carrito y envío a cocina
-├── pedido_detalle.php     Detalle, avance e impresión
-├── pedido_estado.php      Cambio de estado validado
-├── pedido_eliminar.php    Borrado de pendientes (admin)
-├── platos.php             Carta administrativa
-├── plato_form.php         Alta y edición de platos
-├── plato_estado.php       Disponible / agotado
-├── plato_eliminar.php     Borrado protegido
-├── usuarios.php           Listado de cuentas
-├── usuario_form.php       Alta y edición de cuentas
-├── usuario_accion.php     Activar o suspender
-├── usuario_eliminar.php   Borrado protegido
-├── includes/
-│   ├── config.php         Conexión, sesión y constantes
-│   ├── funciones.php      Formatos, estados, CSRF e iconos
-│   ├── auth.php           Sesión y permisos por rol
-│   ├── comanda.php        Tarjeta de pedido reutilizable
-│   ├── header.php         Armazón del sistema
-│   ├── footer.php
-│   ├── sitio_header.php   Cabecera pública
-│   └── sitio_footer.php
-├── assets/
-│   ├── css/               Estilos propios y tipografías
-│   ├── js/app.js          Carrito, menú, filtros y confirmaciones
-│   ├── fonts/             IBM Plex Sans y Plex Mono (locales)
-│   ├── img/               Fotografías de Pexels y favicon
-│   └── vendor/            Bootstrap 5.3.3 local
-└── sql/pwatarea6.sql      Base completa con datos de prueba
+├── index.php, carta.php, login.php, registro.php   Parte pública
+├── panel.php, pedidos.php, pedido_*.php           Pedidos por rol
+├── platos.php, plato_*.php                        Carta (administrador)
+├── usuarios.php, usuario_*.php                    Cuentas (administrador)
+├── includes/                                       Conexión, sesión, permisos y plantillas
+├── assets/                                         CSS, JS, fuentes, fotos y Bootstrap local
+└── sql/pwatarea6.sql                               Base con datos de prueba
 ```
 
-## Decisiones técnicas
+## Notas
 
-- **PDO con consultas preparadas** en todas las páginas. Los precios del pedido se vuelven a leer de la base al guardar; el navegador solo envía cantidades.
-- **Contraseñas cifradas** con `password_hash()` y verificadas con `password_verify()`.
-- **Token CSRF** en todos los formularios que modifican datos (`csrf_campo()` y `csrf_validar()`).
-- **Transacciones** al crear un pedido: se guarda la cabecera y sus líneas, o no se guarda nada.
-- **Historial protegido**: un plato con pedidos o una cuenta con historial no se eliminan, se marcan como agotados o suspendidos.
-- La tabla `order_items` amplía el esquema del enunciado, que tenía un solo plato por pedido. Así un pedido puede llevar varios platos y se conserva el precio del momento de la venta.
-- Bootstrap 5 se usa para la retícula, los formularios y los componentes base; el diseño propio está en `assets/css/estilos.css`.
+- PDO con consultas preparadas. Al guardar un pedido, los precios se leen otra vez de la base.
+- Contraseñas con `password_hash`, token CSRF en los formularios y transacciones al crear pedidos.
+- Un plato con pedidos o una cuenta con historial no se eliminan: se marcan como agotados o suspendidos.
+- `order_items` amplía el esquema del enunciado para que un pedido lleve varios platos y conserve el precio de venta.
+- Bootstrap, las fuentes y las fotos de Pexels están en el proyecto; no se carga nada desde CDN.
 
-## Publicación en un hospedaje
+## Publicar
 
-1. Sube el proyecto sin `includes/config.local.php`.
-2. Crea la base en phpMyAdmin e importa `sql/pwatarea6.sql` con codificación `utf8mb4`.
-3. Edita `includes/config.php` con el host, la base, el usuario y la clave que entrega el proveedor, y deja `APP_DEBUG` en `false`.
-4. Comprueba que el servidor tenga PHP 8 y la extensión `pdo_mysql`.
+Importa `sql/pwatarea6.sql` en la base del hospedaje, crea allí `includes/config.local.php` con los datos de conexión y deja `APP_DEBUG` en `false` dentro de `includes/config.php`.
 
 ## Créditos
 
-Fotografías de [Pexels](https://www.pexels.com), de uso libre. Tipografías IBM Plex con licencia SIL Open Font License. Bootstrap 5 con licencia MIT.
+Fotografías de [Pexels](https://www.pexels.com). IBM Plex (SIL OFL) y Bootstrap 5 (MIT).
