@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Portada pública: qué es A la Carta, cómo funciona el sistema,
  * los cuatro roles y una muestra de la carta.

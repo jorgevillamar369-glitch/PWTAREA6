@@ -4,6 +4,8 @@ Sistema de gestión de restaurante con cuatro roles y permisos, hecho con PHP 8,
 
 **Grupo 04:** Bruce Balarezo, Norka Mideros, Mauro Chinlle, Jorge Villamar y Liseth Criollo.
 
+**Sitio:** https://pwtarea6.infinityfreeapp.com · **Repositorio:** https://github.com/jorgevillamar369-glitch/PWTAREA6
+
 ## Ejecutar en local
 
 Necesitas PHP 8.1 con `pdo_mysql` y MySQL 8 o MariaDB 10.4.
